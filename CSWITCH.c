@@ -9,6 +9,7 @@
 /*****************************************************************/
 
 #include "drawlib.h"
+#include "stdlib.h"
 
 
 //****************************************************************************
@@ -30,8 +31,10 @@
 #define WHITE           0
 #define TRUE            1
 #define FALSE           0
+#define PARTICLE_COUNT  20
 
 typedef enum {CIRCLE, LINE} Shape;
+typedef enum {MENU, GAMEPLAY, GAMEOVER} State;
 
 typedef struct Star{
     int x,y,color;
@@ -46,20 +49,30 @@ typedef struct Camera{
     int x, y;
 } Camera;
 
+
+typedef struct Particle{
+    int x, y, vel_x, vel_y, rad;
+} Particle;
+
 unsigned int key, key1, key2, unused = 0;
 int ball_x = SCREEN_WIDTH/2, ball_y = SCREEN_HEIGHT/2;
 int ball_speed = 5;
 int BALL_RADIUS = 4;
 Star stars[10];
 Obstacle obstacles[10];
+Particle particles[PARTICLE_COUNT];
 Camera cam;
+State gamestate = GAMEPLAY;
 int angle = 0;
+int score = 0, highscore = 0;
+int ball_dead = FALSE;
 
 void fill_screen(int color);
 void ball_update();
 void ball_jump();
 void ball_draw();
 void draw_stars();
+void draw_score(int color);
 void collision_detection();
 
 int handle_keys(){
@@ -104,14 +117,23 @@ void gen_obstacles(){
 
 void fill_old_squares(){
     int i;
-    draw_filled_rectangle(ball_x-BALL_RADIUS-cam.x, ball_y-BALL_RADIUS, BALL_RADIUS*2, BALL_RADIUS*2, BLACK);
+    if(ball_dead){
+        for(i = 0; i <= PARTICLE_COUNT-1; i++){
+            Particle p = particles[i];
+            draw_filled_circle(p.x-cam.x, p.y, p.rad, BLACK);
+        }
+    }else{
+        draw_filled_rectangle(ball_x-BALL_RADIUS-cam.x, ball_y-BALL_RADIUS, BALL_RADIUS*2, BALL_RADIUS*2, BLACK);
+    }
     for(i = 0; i <= 9; i++){
         Star star = stars[i];
+        Obstacle obstacle = obstacles[i];
         if(star.x-cam.x <= SCREEN_WIDTH && star.x-cam.x >= 0){
             draw_filled_star(star.x-cam.x, star.y, !star.color);
-            draw_filled_circle(star.x-cam.x, star.y, 30, !star.color);
         }
-        
+        if(obstacle.x-cam.x < SCREEN_WIDTH+obstacle.rad && obstacle.x-cam.x > -obstacle.rad){
+            draw_filled_circle(obstacle.x-cam.x, obstacle.y, 29, !obstacle.color);
+        }
     }
     
 }
@@ -129,7 +151,8 @@ int AddIn_main(int isAppli, unsigned short OptionNum){
         Bkey_GetKeyWait(&key1, &key2, KEYWAIT_HALTOFF_TIMEROFF, 0, 1, &unused);
         
         fill_old_squares();      
-        angle+=3;
+        draw_score(WHITE);
+        angle+=5;
         if(angle >= 360)
             angle = 0;
         for(i = 0; i < sizeof(obstacles)/sizeof(obstacles[0]); i++){
@@ -160,16 +183,33 @@ void ball_jump(){
 }
 
 void ball_update(){
-    ball_x+=ball_speed;
-    if(cam.x <= ball_x-SCREEN_WIDTH*0.4)
-        cam.x = ball_x-SCREEN_WIDTH*0.4;
-    ball_speed-=1;
-    collision_detection();
+    int i;
+    if(!ball_dead){
+        ball_x+=ball_speed;
+        if(cam.x <= ball_x-SCREEN_WIDTH*0.4)
+            cam.x = ball_x-SCREEN_WIDTH*0.4;
+        ball_speed-=1;
+        collision_detection();
+    }else{
+        for(i = 0; i <= PARTICLE_COUNT-1; i++){
+            particles[i].x+=particles[i].vel_x;
+            particles[i].y+=particles[i].vel_y;
+           particles[i].vel_x--;
+        }
+    }
 }
 
 void ball_draw(int color){
-    if(ball_x-cam.x >= 0){
+    int i;
+    if(ball_x-cam.x >= 0 && !ball_dead){
         draw_filled_circle(ball_x-cam.x, ball_y, BALL_RADIUS, color);
+    }
+    if(ball_dead){
+        for(i = 0; i < PARTICLE_COUNT-1; i++){
+            Particle p = particles[i];
+            draw_pixel(p.x-cam.x, p.y, color);
+            draw_filled_circle(p.x-cam.x, p.y, p.rad, color);
+        }
     }
 }
 
@@ -182,10 +222,176 @@ void fill_screen(int color){
     }
 }
 
+void draw_number(int number, int x, int y, int color){
+    switch(number){
+        case 0:
+            draw_pixel(x,y+1,color);
+            draw_pixel(x,y+2,color);
+            draw_pixel(x-1,y,color);
+            draw_pixel(x-1,y+3,color);
+            draw_pixel(x-2,y,color);
+            draw_pixel(x-2,y+3,color);
+            draw_pixel(x-3,y,color);
+            draw_pixel(x-3,y+3,color);
+            draw_pixel(x-4,y+1,color);
+            draw_pixel(x-4,y+2,color);
+            break;
+        case 1:
+            draw_pixel(x,y+1,color);
+            draw_pixel(x-1,y,color);
+            draw_pixel(x-1,y+1,color);
+            draw_pixel(x-2,y+1,color);
+            draw_pixel(x-3,y+1,color);
+            draw_pixel(x-4,y,color);
+            draw_pixel(x-4,y+1,color);
+            draw_pixel(x-4,y+2,color);
+            break;
+        case 2:
+            draw_pixel(x,y+1,color);
+            draw_pixel(x,y+2,color);
+            draw_pixel(x-1,y,color);
+            draw_pixel(x-1,y+3,color);
+            draw_pixel(x-2,y+2,color);
+            draw_pixel(x-3,y+1,color);
+            draw_pixel(x-4,y,color);
+            draw_pixel(x-4,y+1,color);
+            draw_pixel(x-4,y+2,color);
+            draw_pixel(x-4,y+3,color);
+            break;
+        case 3:
+            draw_pixel(x,y,color);
+            draw_pixel(x,y+1,color);
+            draw_pixel(x,y+2,color);
+            draw_pixel(x-1,y+3,color);
+            draw_pixel(x-2,y+1,color);
+            draw_pixel(x-2,y+2,color);
+            draw_pixel(x-3,y+3,color);
+            draw_pixel(x-4,y,color);
+            draw_pixel(x-4,y+1,color);
+            draw_pixel(x-4,y+2,color);
+            break;
+        case 4:
+            draw_pixel(x,y+2,color);
+            draw_pixel(x,y+3,color);
+            draw_pixel(x-1,y+1,color);
+            draw_pixel(x-1,y+3,color);
+            draw_pixel(x-2,y,color);
+            draw_pixel(x-2,y+3,color);
+            draw_pixel(x-3,y,color);
+            draw_pixel(x-3,y+1,color);
+            draw_pixel(x-3,y+2,color);
+            draw_pixel(x-3,y+3,color);
+            draw_pixel(x-4,y+3,color);
+            break;
+        case 5:
+            draw_pixel(x,y,color);
+            draw_pixel(x,y+1,color);
+            draw_pixel(x,y+2,color);
+            draw_pixel(x,y+3,color);
+            draw_pixel(x-1,y,color);
+            draw_pixel(x-2,y,color);
+            draw_pixel(x-2,y+1,color);
+            draw_pixel(x-2,y+2,color);
+            draw_pixel(x-2,y+3,color);
+            draw_pixel(x-3,y+3,color);
+            draw_pixel(x-4,y,color);
+            draw_pixel(x-4,y+1,color);
+            draw_pixel(x-4,y+2,color);
+            break;
+        case 6: 
+            draw_pixel(x,y+1,color);
+            draw_pixel(x,y+2,color);
+            draw_pixel(x-1,y,color);
+            draw_pixel(x-2,y,color);
+            draw_pixel(x-2,y+1,color);
+            draw_pixel(x-2,y+2,color);
+            draw_pixel(x-3,y,color);
+            draw_pixel(x-3,y+3,color);
+            draw_pixel(x-4,y+1,color);
+            draw_pixel(x-4,y+2,color);
+            break;
+        case 7:
+            draw_pixel(x,y,color);
+            draw_pixel(x,y+1,color);
+            draw_pixel(x,y+2,color);
+            draw_pixel(x,y+3,color);
+            draw_pixel(x-1,y+3,color);
+            draw_pixel(x-2,y+2,color);
+            draw_pixel(x-3,y+2,color);
+            draw_pixel(x-4,y+2,color);
+            break;
+        case 8:
+            draw_pixel(x,y+1,color);
+            draw_pixel(x,y+2,color);
+            draw_pixel(x-1,y,color);
+            draw_pixel(x-1,y+3,color);
+            draw_pixel(x-2,y+1,color);
+            draw_pixel(x-2,y+2,color);
+            draw_pixel(x-3,y,color);
+            draw_pixel(x-3,y+3,color);
+            draw_pixel(x-4,y+1,color);
+            draw_pixel(x-4,y+2,color);
+            break;
+        case 9:
+            draw_pixel(x,y+1,color);
+            draw_pixel(x,y+2,color);
+            draw_pixel(x-1,y,color);
+            draw_pixel(x-1,y+3,color);
+            draw_pixel(x-2,y+1,color);
+            draw_pixel(x-2,y+2,color);
+            draw_pixel(x-2,y+3,color);
+            draw_pixel(x-3,y+3,color);
+            draw_pixel(x-4,y+1,color);
+            draw_pixel(x-4,y+2,color);
+            break;
+    }
+}
 
+void draw_score(int color){
+    draw_filled_rectangle(122,1,5,4,!color);
+    draw_number(score, 126, 1, color);
+}
+
+void ball_explode(){
+    int i;
+    ball_dead = TRUE;
+    for(i = 0; i <= PARTICLE_COUNT-1; i++){
+        Particle particle;
+        particle.x = ball_x;
+        particle.y = ball_y;
+        particle.vel_x = rand()%15+(-5);
+        particle.vel_y = rand()%11+(-5);
+        particle.rad = 1;
+        particles[i] = particle;
+    }
+}
+
+void create_obstacle(){
+    
+}
 
 void collision_detection(){
-    
+    int i;
+    Star star;
+    if(ball_x >= stars[0].x){
+        score++;
+        for(i = 0; i <= 8; i++){
+            stars[i] = stars[i+1];
+        }
+        star.x = stars[8].x+150;
+        star.y = stars[8].y;
+        star.color = WHITE;
+        stars[9] = star;
+        create_obstacle();
+    }
+    if((ball_x+BALL_RADIUS/2 >= obstacles[0].x+obstacles[0].rad-obstacles[0].thickness && ball_x-BALL_RADIUS/2 <= obstacles[0].x+obstacles[0].rad) && !(angle >= 90 && angle <= 180)){
+        ball_explode();
+    }else if((ball_x+BALL_RADIUS/2 >= obstacles[0].x-obstacles[0].rad && ball_x-BALL_RADIUS/2 <= obstacles[0].x-obstacles[0].rad+obstacles[0].thickness) && !(angle >= 270 && angle <= 360)){
+        ball_explode();
+    }
+    if(ball_x-cam.x <= -BALL_RADIUS/2){
+        ball_explode();
+    }
 }
 
 //****************************************************************************
