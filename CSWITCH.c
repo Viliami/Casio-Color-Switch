@@ -222,134 +222,26 @@ void fill_screen(int color){
     }
 }
 
-void draw_number(int number, int x, int y, int color){
-    switch(number){
-        case 0:
-            draw_pixel(x,y+1,color);
-            draw_pixel(x,y+2,color);
-            draw_pixel(x-1,y,color);
-            draw_pixel(x-1,y+3,color);
-            draw_pixel(x-2,y,color);
-            draw_pixel(x-2,y+3,color);
-            draw_pixel(x-3,y,color);
-            draw_pixel(x-3,y+3,color);
-            draw_pixel(x-4,y+1,color);
-            draw_pixel(x-4,y+2,color);
-            break;
-        case 1:
-            draw_pixel(x,y+1,color);
-            draw_pixel(x-1,y,color);
-            draw_pixel(x-1,y+1,color);
-            draw_pixel(x-2,y+1,color);
-            draw_pixel(x-3,y+1,color);
-            draw_pixel(x-4,y,color);
-            draw_pixel(x-4,y+1,color);
-            draw_pixel(x-4,y+2,color);
-            break;
-        case 2:
-            draw_pixel(x,y+1,color);
-            draw_pixel(x,y+2,color);
-            draw_pixel(x-1,y,color);
-            draw_pixel(x-1,y+3,color);
-            draw_pixel(x-2,y+2,color);
-            draw_pixel(x-3,y+1,color);
-            draw_pixel(x-4,y,color);
-            draw_pixel(x-4,y+1,color);
-            draw_pixel(x-4,y+2,color);
-            draw_pixel(x-4,y+3,color);
-            break;
-        case 3:
-            draw_pixel(x,y,color);
-            draw_pixel(x,y+1,color);
-            draw_pixel(x,y+2,color);
-            draw_pixel(x-1,y+3,color);
-            draw_pixel(x-2,y+1,color);
-            draw_pixel(x-2,y+2,color);
-            draw_pixel(x-3,y+3,color);
-            draw_pixel(x-4,y,color);
-            draw_pixel(x-4,y+1,color);
-            draw_pixel(x-4,y+2,color);
-            break;
-        case 4:
-            draw_pixel(x,y+2,color);
-            draw_pixel(x,y+3,color);
-            draw_pixel(x-1,y+1,color);
-            draw_pixel(x-1,y+3,color);
-            draw_pixel(x-2,y,color);
-            draw_pixel(x-2,y+3,color);
-            draw_pixel(x-3,y,color);
-            draw_pixel(x-3,y+1,color);
-            draw_pixel(x-3,y+2,color);
-            draw_pixel(x-3,y+3,color);
-            draw_pixel(x-4,y+3,color);
-            break;
-        case 5:
-            draw_pixel(x,y,color);
-            draw_pixel(x,y+1,color);
-            draw_pixel(x,y+2,color);
-            draw_pixel(x,y+3,color);
-            draw_pixel(x-1,y,color);
-            draw_pixel(x-2,y,color);
-            draw_pixel(x-2,y+1,color);
-            draw_pixel(x-2,y+2,color);
-            draw_pixel(x-2,y+3,color);
-            draw_pixel(x-3,y+3,color);
-            draw_pixel(x-4,y,color);
-            draw_pixel(x-4,y+1,color);
-            draw_pixel(x-4,y+2,color);
-            break;
-        case 6: 
-            draw_pixel(x,y+1,color);
-            draw_pixel(x,y+2,color);
-            draw_pixel(x-1,y,color);
-            draw_pixel(x-2,y,color);
-            draw_pixel(x-2,y+1,color);
-            draw_pixel(x-2,y+2,color);
-            draw_pixel(x-3,y,color);
-            draw_pixel(x-3,y+3,color);
-            draw_pixel(x-4,y+1,color);
-            draw_pixel(x-4,y+2,color);
-            break;
-        case 7:
-            draw_pixel(x,y,color);
-            draw_pixel(x,y+1,color);
-            draw_pixel(x,y+2,color);
-            draw_pixel(x,y+3,color);
-            draw_pixel(x-1,y+3,color);
-            draw_pixel(x-2,y+2,color);
-            draw_pixel(x-3,y+2,color);
-            draw_pixel(x-4,y+2,color);
-            break;
-        case 8:
-            draw_pixel(x,y+1,color);
-            draw_pixel(x,y+2,color);
-            draw_pixel(x-1,y,color);
-            draw_pixel(x-1,y+3,color);
-            draw_pixel(x-2,y+1,color);
-            draw_pixel(x-2,y+2,color);
-            draw_pixel(x-3,y,color);
-            draw_pixel(x-3,y+3,color);
-            draw_pixel(x-4,y+1,color);
-            draw_pixel(x-4,y+2,color);
-            break;
-        case 9:
-            draw_pixel(x,y+1,color);
-            draw_pixel(x,y+2,color);
-            draw_pixel(x-1,y,color);
-            draw_pixel(x-1,y+3,color);
-            draw_pixel(x-2,y+1,color);
-            draw_pixel(x-2,y+2,color);
-            draw_pixel(x-2,y+3,color);
-            draw_pixel(x-3,y+3,color);
-            draw_pixel(x-4,y+1,color);
-            draw_pixel(x-4,y+2,color);
-            break;
-    }
-}
-
 void draw_score(int color){
-    draw_filled_rectangle(122,1,5,4,!color);
-    draw_number(score, 126, 1, color);
+    int ones, tens, hundreds;
+    if(score < 10){
+        draw_filled_rectangle(122,1,5,4,!color);
+        draw_number(score, 126, 1, color);
+    }else if(score < 100){
+        tens = (int)score/10;
+        ones = score-(tens*10);
+        draw_filled_rectangle(122,1,5,8,!color);
+        draw_number(tens, 126, 1, color);
+        draw_number(ones, 126, 5, color);
+    }else if(score < 1000){
+        hundreds = (int)score/100;
+        tens = (int)((score-(hundreds*100))/10);
+        ones = score-hundreds*100-tens*10;
+        draw_filled_rectangle(122,1,5,13,!color);
+        draw_number(hundreds, 126, 1, color);
+        draw_number(tens, 126, 5, color);
+        draw_number(ones, 126, 10, color);
+    }
 }
 
 void ball_explode(){
@@ -359,8 +251,8 @@ void ball_explode(){
         Particle particle;
         particle.x = ball_x;
         particle.y = ball_y;
-        particle.vel_x = rand()%15+(-5);
-        particle.vel_y = rand()%11+(-5);
+        particle.vel_x = (int)rand()%15+(-5);
+        particle.vel_y = (int)rand()%11+(-5);
         particle.rad = 1;
         particles[i] = particle;
     }
@@ -384,10 +276,14 @@ void collision_detection(){
         stars[9] = star;
         create_obstacle();
     }
-    if((ball_x+BALL_RADIUS/2 >= obstacles[0].x+obstacles[0].rad-obstacles[0].thickness && ball_x-BALL_RADIUS/2 <= obstacles[0].x+obstacles[0].rad) && !(angle >= 90 && angle <= 180)){
-        ball_explode();
-    }else if((ball_x+BALL_RADIUS/2 >= obstacles[0].x-obstacles[0].rad && ball_x-BALL_RADIUS/2 <= obstacles[0].x-obstacles[0].rad+obstacles[0].thickness) && !(angle >= 270 && angle <= 360)){
-        ball_explode();
+    for(i = 0; i <= 9; i++){
+        if(obstacles[i].x -cam.x > 0 && obstacles[i].x-cam.x < SCREEN_WIDTH){
+            if((ball_x+BALL_RADIUS/2 >= obstacles[i].x+obstacles[i].rad-obstacles[i].thickness && ball_x-BALL_RADIUS/2 <= obstacles[i].x+obstacles[i].rad) && !(angle >= 90 && angle <= 180)){
+                ball_explode();
+            }else if((ball_x+BALL_RADIUS/2 >= obstacles[i].x-obstacles[i].rad && ball_x-BALL_RADIUS/2 <= obstacles[i].x-obstacles[i].rad+obstacles[i].thickness) && !(angle >= 270 && angle <= 360)){
+                ball_explode();
+            }
+        }
     }
     if(ball_x-cam.x <= -BALL_RADIUS/2){
         ball_explode();
