@@ -270,3 +270,128 @@ void draw_arc(int cX, int cY, int rad, int sAngle, int eAngle, int color){
         draw_circle_points(cX, cY, x, y, sAngle, eAngle, color);
     }
 }
+
+void draw_number(int number, int x, int y, int color){
+    switch(number){
+        case 0:
+            draw_pixel(x,y+1,color);
+            draw_pixel(x,y+2,color);
+            draw_pixel(x-1,y,color);
+            draw_pixel(x-1,y+3,color);
+            draw_pixel(x-2,y,color);
+            draw_pixel(x-2,y+3,color);
+            draw_pixel(x-3,y,color);
+            draw_pixel(x-3,y+3,color);
+            draw_pixel(x-4,y+1,color);
+            draw_pixel(x-4,y+2,color);
+            break;
+        case 1:
+            draw_pixel(x,y+1,color);
+            draw_pixel(x-1,y,color);
+            draw_pixel(x-1,y+1,color);
+            draw_pixel(x-2,y+1,color);
+            draw_pixel(x-3,y+1,color);
+            draw_pixel(x-4,y,color);
+            draw_pixel(x-4,y+1,color);
+            draw_pixel(x-4,y+2,color);
+            break;
+        case 2:
+            draw_pixel(x,y+1,color);
+            draw_pixel(x,y+2,color);
+            draw_pixel(x-1,y,color);
+            draw_pixel(x-1,y+3,color);
+            draw_pixel(x-2,y+2,color);
+            draw_pixel(x-3,y+1,color);
+            draw_pixel(x-4,y,color);
+            draw_pixel(x-4,y+1,color);
+            draw_pixel(x-4,y+2,color);
+            draw_pixel(x-4,y+3,color);
+            break;
+        case 3:
+            draw_pixel(x,y,color);
+            draw_pixel(x,y+1,color);
+            draw_pixel(x,y+2,color);
+            draw_pixel(x-1,y+3,color);
+            draw_pixel(x-2,y+1,color);
+            draw_pixel(x-2,y+2,color);
+            draw_pixel(x-3,y+3,color);
+            draw_pixel(x-4,y,color);
+            draw_pixel(x-4,y+1,color);
+            draw_pixel(x-4,y+2,color);
+            break;
+        case 4:
+            draw_pixel(x,y+2,color);
+            draw_pixel(x,y+3,color);
+            draw_pixel(x-1,y+1,color);
+            draw_pixel(x-1,y+3,color);
+            draw_pixel(x-2,y,color);
+            draw_pixel(x-2,y+3,color);
+            draw_pixel(x-3,y,color);
+            draw_pixel(x-3,y+1,color);
+            draw_pixel(x-3,y+2,color);
+            draw_pixel(x-3,y+3,color);
+            draw_pixel(x-4,y+3,color);
+            break;
+        case 5:
+            draw_pixel(x,y,color);
+            draw_pixel(x,y+1,color);
+            draw_pixel(x,y+2,color);
+            draw_pixel(x,y+3,color);
+            draw_pixel(x-1,y,color);
+            draw_pixel(x-2,y,color);
+            draw_pixel(x-2,y+1,color);
+            draw_pixel(x-2,y+2,color);
+            draw_pixel(x-2,y+3,color);
+            draw_pixel(x-3,y+3,color);
+            draw_pixel(x-4,y,color);
+            draw_pixel(x-4,y+1,color);
+            draw_pixel(x-4,y+2,color);
+            break;
+        case 6: 
+            draw_pixel(x,y+1,color);
+            draw_pixel(x,y+2,color);
+            draw_pixel(x-1,y,color);
+            draw_pixel(x-2,y,color);
+            draw_pixel(x-2,y+1,color);
+            draw_pixel(x-2,y+2,color);
+            draw_pixel(x-3,y,color);
+            draw_pixel(x-3,y+3,color);
+            draw_pixel(x-4,y+1,color);
+            draw_pixel(x-4,y+2,color);
+            break;
+        case 7:
+            draw_pixel(x,y,color);
+            draw_pixel(x,y+1,color);
+            draw_pixel(x,y+2,color);
+            draw_pixel(x,y+3,color);
+            draw_pixel(x-1,y+3,color);
+            draw_pixel(x-2,y+2,color);
+            draw_pixel(x-3,y+2,color);
+            draw_pixel(x-4,y+2,color);
+            break;
+        case 8:
+            draw_pixel(x,y+1,color);
+            draw_pixel(x,y+2,color);
+            draw_pixel(x-1,y,color);
+            draw_pixel(x-1,y+3,color);
+            draw_pixel(x-2,y+1,color);
+            draw_pixel(x-2,y+2,color);
+            draw_pixel(x-3,y,color);
+            draw_pixel(x-3,y+3,color);
+            draw_pixel(x-4,y+1,color);
+            draw_pixel(x-4,y+2,color);
+            break;
+        case 9:
+            draw_pixel(x,y+1,color);
+            draw_pixel(x,y+2,color);
+            draw_pixel(x-1,y,color);
+            draw_pixel(x-1,y+3,color);
+            draw_pixel(x-2,y+1,color);
+            draw_pixel(x-2,y+2,color);
+            draw_pixel(x-2,y+3,color);
+            draw_pixel(x-3,y+3,color);
+            draw_pixel(x-4,y+1,color);
+            draw_pixel(x-4,y+2,color);
+            break;
+    }
+}
