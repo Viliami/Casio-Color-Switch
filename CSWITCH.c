@@ -197,7 +197,7 @@ int AddIn_main(int isAppli, unsigned short OptionNum){
     
     gen_obstacles();
     cam.x = 0; cam.y = 0;
-    Sleep(10);
+    Sleep(50);
     while(handle_keys()){
         Bkey_GetKeyWait(&key1, &key2, KEYWAIT_HALTOFF_TIMEROFF, 0, 1, &unused);
         
@@ -242,24 +242,6 @@ void draw_play_button(int x, int y, int color){
     draw_filled_circle(x,y,12,color);
     x-=7;
     y-=5;
-    /*
-    0,1,1,1,1,1,1,1,1,1,1,1,1,1-
-    0,1,1,1,1,1,1,1,1,1,1,1,1,0-
-    0,0,1,1,1,1,1,1,1,1,1,1,1,0-
-    0,0,0,1,1,1,1,1,1,1,1,1,0,0-
-    0,0,0,1,1,1,1,1,1,1,1,1,0,0-
-    0,0,0,0,1,1,1,1,1,1,1,0,0,0-
-    0,0,0,0,1,1,1,1,1,1,1,0,0,0-
-    0,0,0,0,0,1,1,1,1,1,0,0,0,0-
-    0,0,0,0,0,1,1,1,1,1,0,0,0,0-
-    0,0,0,0,0,0,1,1,1,0,0,0,0,0-
-    0,0,0,0,0,0,1,1,1,0,0,0,0,0-
-    0,0,0,0,0,0,0,1,0,0,0,0,0,0-
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0
-    */
-    
-    
     draw_line(x+1,y,x+13,y,!color);
     draw_line(x+1,y+1,x+12,y+1,!color);
     draw_line(x+2,y+2,x+12,y+2,!color);
@@ -285,7 +267,8 @@ void draw_menu(){
     draw_circle(SCREEN_WIDTH/2-20, SCREEN_HEIGHT/2, 26, WHITE);
     draw_circle(SCREEN_WIDTH/2-20, SCREEN_HEIGHT/2, 22, WHITE);
     draw_play_button(SCREEN_WIDTH/2-20, SCREEN_HEIGHT/2, WHITE);
-    
+    draw_vertical_text("Color",100,10,WHITE);
+    draw_vertical_text("Switch",90,10,WHITE);
 }
 
 void draw_obstacles(){
@@ -376,7 +359,7 @@ void draw_score(int color){
         draw_filled_rectangle(122,1,5,15,!color);
         draw_number(hundreds, 126, 1, color);
         draw_number(tens, 126, 6, color);
-        draw_number(ones, 126, 11, color);
+        draw_number(ones, 126, 10, color);
     }
 }
 
@@ -388,7 +371,7 @@ void ball_explode(){
         particle.x = ball_x;
         particle.y = ball_y;
         particle.vel_x = (int)rand()%15+(-5);
-        particle.vel_y = (int)rand()%11+(-5);
+        particle.vel_y = (int)rand()%10+(-5);
         particle.rad = 1;
         particles[i] = particle;
     }
