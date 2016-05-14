@@ -34,7 +34,7 @@
 #define PARTICLE_COUNT  20
 
 typedef enum {CIRCLE, DOUBLE_CIRCLE, LINE} Shape;
-typedef enum {MENU, GAMEPLAY, GAMEOVER} State;
+typedef enum {MENU, GAMEPLAY, PAUSED, GAMEOVER} State;
 
 typedef struct Star{
     int x,y,color;
@@ -66,6 +66,7 @@ State gamestate = MENU;
 int angle = 0;
 int score = 0, highscore = 0;
 int ball_dead = FALSE;
+int explosion_counter = 0;
 
 void fill_screen(int color);
 void fill_old_squares();
@@ -79,6 +80,7 @@ void draw_obstacle(Obstacle obstacle);
 void draw_obstacles();
 void update_obstacles();
 void collision_detection();
+void draw_gameover_screen();
 Obstacle new_obstacle(int x, int y, int COLOR);
 
 int random_number(int min, int max){
@@ -160,7 +162,7 @@ void fill_old_squares(){
     int i;
     switch(gamestate){
         case MENU:
-            draw_filled_rectangle(SCREEN_WIDTH/2-46, SCREEN_HEIGHT/2-26, 51, 51, BLACK);
+            draw_filled_rectangle(SCREEN_WIDTH/2-50, SCREEN_HEIGHT/2-30, 59, 58, BLACK);
             break;
         case GAMEPLAY:
             if(ball_dead){
@@ -185,8 +187,6 @@ void fill_old_squares(){
                     }
                 }
             }
-            break;
-        case GAMEOVER:
             break;
     }
 }
@@ -228,6 +228,7 @@ int AddIn_main(int isAppli, unsigned short OptionNum){
                 draw_obstacles();
                 break;
             case GAMEOVER:
+                draw_gameover_screen();
                 break;
         }
 
@@ -236,6 +237,219 @@ int AddIn_main(int isAppli, unsigned short OptionNum){
     }
 
     return 1;
+}
+
+void draw_replay_button(int x, int y, int color){
+    x-=12;
+    y-=12;
+    draw_pixel(x+23, y+11, color);
+    draw_pixel(x+23, y+12, color);
+    draw_line(x+22,y+7,x+22, y+9);
+    draw_line(x+22, y+10, x+22, y+16);
+    draw_pixel(x+21, y+2, color);
+    draw_line()
+    draw_pixel(x+21, y+6, color);
+    draw_pixel(x+21, y+7, color);
+    draw_pixel(x+21, y+8, color);
+    draw_pixel(x+21, y+9, color);
+    draw_pixel(x+21, y+10, color);
+    draw_pixel(x+21, y+11, color);
+    draw_pixel(x+21, y+12, color);
+    draw_pixel(x+21, y+13, color);
+    draw_pixel(x+21, y+14, color);
+    draw_pixel(x+21, y+15, color);
+    draw_pixel(x+21, y+16, color);
+    draw_pixel(x+21, y+17, color);
+    draw_pixel(x+21, y+18, color);
+    draw_pixel(x+20, y+2, color);
+    draw_pixel(x+20, y+3, color);
+    draw_pixel(x+20, y+5, color);
+    draw_pixel(x+20, y+6, color);
+    draw_pixel(x+20, y+7, color);
+    draw_pixel(x+20, y+8, color);
+    draw_pixel(x+20, y+9, color);
+    draw_pixel(x+20, y+10, color);
+    draw_pixel(x+20, y+11, color);
+    draw_pixel(x+20, y+12, color);
+    draw_pixel(x+20, y+13, color);
+    draw_pixel(x+20, y+14, color);
+    draw_pixel(x+20, y+15, color);
+    draw_pixel(x+20, y+16, color);
+    draw_pixel(x+20, y+17, color);
+    draw_pixel(x+20, y+18, color);
+    draw_pixel(x+20, y+19, color);
+    draw_pixel(x+19, y+2, color);
+    draw_pixel(x+19, y+3, color);
+    draw_pixel(x+19, y+4, color);
+    draw_pixel(x+19, y+5, color);
+    draw_pixel(x+19, y+6, color);
+    draw_pixel(x+19, y+7, color);
+    draw_pixel(x+19, y+8, color);
+    draw_pixel(x+19, y+9, color);
+    draw_pixel(x+19, y+10, color);
+    draw_pixel(x+19, y+11, color);
+    draw_pixel(x+19, y+12, color);
+    draw_pixel(x+19, y+13, color);
+    draw_pixel(x+19, y+14, color);
+    draw_pixel(x+19, y+15, color);
+    draw_pixel(x+19, y+16, color);
+    draw_pixel(x+19, y+17, color);
+    draw_pixel(x+19, y+18, color);
+    draw_pixel(x+19, y+19, color);
+    draw_pixel(x+19, y+20, color);
+    draw_pixel(x+18, y+2, color);
+    draw_pixel(x+18, y+3, color);
+    draw_pixel(x+18, y+4, color);
+    draw_pixel(x+18, y+5, color);
+    draw_pixel(x+18, y+6, color);
+    draw_pixel(x+18, y+7, color);
+    draw_pixel(x+18, y+8, color);
+    draw_pixel(x+18, y+9, color);
+    draw_pixel(x+18, y+10, color);
+    draw_pixel(x+18, y+13, color);
+    draw_pixel(x+18, y+14, color);
+    draw_pixel(x+18, y+15, color);
+    draw_pixel(x+18, y+16, color);
+    draw_pixel(x+18, y+17, color);
+    draw_pixel(x+18, y+18, color);
+    draw_pixel(x+18, y+19, color);
+    draw_pixel(x+18, y+20, color);
+    draw_pixel(x+18, y+21, color);
+    draw_pixel(x+17, y+2, color);
+    draw_pixel(x+17, y+3, color);
+    draw_pixel(x+17, y+4, color);
+    draw_pixel(x+17, y+5, color);
+    draw_pixel(x+17, y+6, color);
+    draw_pixel(x+17, y+7, color);
+    draw_pixel(x+17, y+8, color);
+    draw_pixel(x+17, y+16, color);
+    draw_pixel(x+17, y+17, color);
+    draw_pixel(x+17, y+18, color);
+    draw_pixel(x+17, y+19, color);
+    draw_pixel(x+17, y+20, color);
+    draw_pixel(x+17, y+21, color);
+    draw_pixel(x+16, y+2, color);
+    draw_pixel(x+16, y+3, color);
+    draw_pixel(x+16, y+4, color);
+    draw_pixel(x+16, y+5, color);
+    draw_pixel(x+16, y+6, color);
+    draw_pixel(x+16, y+7, color);
+    draw_pixel(x+16, y+17, color);
+    draw_pixel(x+16, y+18, color);
+    draw_pixel(x+16, y+19, color);
+    draw_pixel(x+16, y+20, color);
+    draw_pixel(x+16, y+21, color);
+    draw_pixel(x+16, y+22, color);
+    draw_pixel(x+15, y+2, color);
+    draw_pixel(x+15, y+3, color);
+    draw_pixel(x+15, y+4, color);
+    draw_pixel(x+15, y+5, color);
+    draw_pixel(x+15, y+6, color);
+    draw_pixel(x+15, y+7, color);
+    draw_pixel(x+15, y+8, color);
+    draw_pixel(x+15, y+17, color);
+    draw_pixel(x+15, y+18, color);
+    draw_pixel(x+15, y+19, color);
+    draw_pixel(x+15, y+20, color);
+    draw_pixel(x+15, y+21, color);
+    draw_pixel(x+15, y+22, color);
+    draw_pixel(x+14, y+2, color);
+    draw_pixel(x+14, y+3, color);
+    draw_pixel(x+14, y+4, color);
+    draw_pixel(x+14, y+5, color);
+    draw_pixel(x+14, y+6, color);
+    draw_pixel(x+14, y+7, color);
+    draw_pixel(x+14, y+8, color);
+    draw_pixel(x+14, y+9, color);
+    draw_pixel(x+14, y+18, color);
+    draw_pixel(x+14, y+19, color);
+    draw_pixel(x+14, y+20, color);
+    draw_pixel(x+14, y+21, color);
+    draw_pixel(x+14, y+22, color);
+    draw_pixel(x+13, y+18, color);
+    draw_pixel(x+13, y+19, color);
+    draw_pixel(x+13, y+20, color);
+    draw_pixel(x+13, y+21, color);
+    draw_pixel(x+13, y+22, color);
+    draw_pixel(x+12, y+18, color);
+    draw_pixel(x+12, y+19, color);
+    draw_pixel(x+12, y+20, color);
+    draw_pixel(x+12, y+21, color);
+    draw_pixel(x+12, y+22, color);
+    draw_pixel(x+11, y+18, color);
+    draw_pixel(x+11, y+19, color);
+    draw_pixel(x+11, y+20, color);
+    draw_pixel(x+11, y+21, color);
+    draw_pixel(x+11, y+22, color);
+    draw_pixel(x+10, y+18, color);
+    draw_pixel(x+10, y+19, color);
+    draw_pixel(x+10, y+20, color);
+    draw_pixel(x+10, y+21, color);
+    draw_pixel(x+10, y+22, color);
+    draw_pixel(x+9, y+17, color);
+    draw_pixel(x+9, y+18, color);
+    draw_pixel(x+9, y+19, color);
+    draw_pixel(x+9, y+20, color);
+    draw_pixel(x+9, y+21, color);
+    draw_pixel(x+9, y+22, color);
+    draw_pixel(x+8, y+17, color);
+    draw_pixel(x+8, y+18, color);
+    draw_pixel(x+8, y+19, color);
+    draw_pixel(x+8, y+20, color);
+    draw_pixel(x+8, y+21, color);
+    draw_pixel(x+7, y+15, color);
+    draw_pixel(x+7, y+16, color);
+    draw_pixel(x+7, y+17, color);
+    draw_pixel(x+7, y+18, color);
+    draw_pixel(x+7, y+19, color);
+    draw_pixel(x+7, y+20, color);
+    draw_pixel(x+7, y+21, color);
+    draw_pixel(x+6, y+12, color);
+    draw_pixel(x+6, y+13, color);
+    draw_pixel(x+6, y+14, color);
+    draw_pixel(x+6, y+15, color);
+    draw_pixel(x+6, y+16, color);
+    draw_pixel(x+6, y+17, color);
+    draw_pixel(x+6, y+18, color);
+    draw_pixel(x+6, y+19, color);
+    draw_pixel(x+6, y+20, color);
+    draw_pixel(x+5, y+12, color);
+    draw_pixel(x+5, y+13, color);
+    draw_pixel(x+5, y+14, color);
+    draw_pixel(x+5, y+15, color);
+    draw_pixel(x+5, y+16, color);
+    draw_pixel(x+5, y+17, color);
+    draw_pixel(x+5, y+18, color);
+    draw_pixel(x+5, y+19, color);
+    draw_pixel(x+4, y+12, color);
+    draw_pixel(x+4, y+13, color);
+    draw_pixel(x+4, y+14, color);
+    draw_pixel(x+4, y+15, color);
+    draw_pixel(x+4, y+16, color);
+    draw_pixel(x+4, y+17, color);
+    draw_pixel(x+4, y+18, color);
+    draw_pixel(x+4, y+19, color);
+    draw_pixel(x+3, y+12, color);
+    draw_pixel(x+3, y+13, color);
+    draw_pixel(x+3, y+14, color);
+    draw_pixel(x+3, y+15, color);
+    draw_pixel(x+3, y+16, color);
+    draw_pixel(x+3, y+17, color);
+    draw_pixel(x+2, y+12, color);
+    draw_pixel(x+2, y+13, color);
+    draw_pixel(x+2, y+14, color);
+    draw_pixel(x+2, y+15, color);
+}
+
+void draw_gameover_screen(){
+    draw_vertical_text("SCORE", 100, 10, WHITE);
+    draw_vertical_text("0", 88, 30, WHITE);
+    draw_filled_rectangle(60,0,10, SCREEN_HEIGHT, WHITE);
+    draw_vertical_text("BEST", 60, 18, BLACK);
+    draw_vertical_text("0", 48, 30, WHITE);
+    draw_filled_circle(25,29, 14, WHITE);
+    draw_circle(25,29, 16, WHITE);
+    draw_replay_button(25,30, BLACK);
 }
 
 void draw_play_button(int x, int y, int color){
@@ -260,12 +474,14 @@ void draw_menu(){
     int i;
     for(i = 16; i <= 20; i++){
         draw_arc(SCREEN_WIDTH/2-20, SCREEN_HEIGHT/2, i, angle, angle+90, WHITE);
-        draw_arc(SCREEN_WIDTH/2-20, SCREEN_HEIGHT/2, i+6, 270-angle, 270-angle+90, WHITE);    
+        draw_arc(SCREEN_WIDTH/2-21, SCREEN_HEIGHT/2, i, angle, angle+90, WHITE);
+        draw_arc(SCREEN_WIDTH/2-20, SCREEN_HEIGHT/2, i+8, 270-angle, 270-angle+90, WHITE);    
+        draw_arc(SCREEN_WIDTH/2-21, SCREEN_HEIGHT/2, i+8, 270-angle, 270-angle+90, WHITE);    
     }
-    draw_circle(SCREEN_WIDTH/2-20, SCREEN_HEIGHT/2, 20, WHITE);
     draw_circle(SCREEN_WIDTH/2-20, SCREEN_HEIGHT/2, 16, WHITE);
-    draw_circle(SCREEN_WIDTH/2-20, SCREEN_HEIGHT/2, 26, WHITE);
-    draw_circle(SCREEN_WIDTH/2-20, SCREEN_HEIGHT/2, 22, WHITE);
+    draw_circle(SCREEN_WIDTH/2-20, SCREEN_HEIGHT/2, 20, WHITE);
+    draw_circle(SCREEN_WIDTH/2-20, SCREEN_HEIGHT/2, 23, WHITE);
+    draw_circle(SCREEN_WIDTH/2-20, SCREEN_HEIGHT/2, 29, WHITE);
     draw_play_button(SCREEN_WIDTH/2-20, SCREEN_HEIGHT/2, WHITE);
     draw_vertical_text("Color",100,10,WHITE);
     draw_vertical_text("Switch",90,10,WHITE);
@@ -314,6 +530,12 @@ void ball_update(){
             particles[i].x+=particles[i].vel_x;
             particles[i].y+=particles[i].vel_y;
            particles[i].vel_x--;
+        }
+        explosion_counter++;
+        if(explosion_counter >= 20){
+            gamestate = GAMEOVER;
+            explosion_counter = 0;
+            fill_screen(BLACK);
         }
     }
 }
