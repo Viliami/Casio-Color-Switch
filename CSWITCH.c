@@ -134,7 +134,8 @@ void draw_obstacle(Obstacle obstacle){
 void gen_obstacles(){
     int i;
     for(i = 0; i <= 9; i++){
-        int rand = random_number(0,1);
+        //int rand = random_number(0,1);
+        int rand = 1;
         Star star;
         Obstacle obstacle;
         //obstacle = new_obstacle(star.x, star.y, WHITE);
@@ -244,10 +245,7 @@ void draw_replay_button(int x, int y, int color){
     y-=12;
     draw_pixel(x+23, y+11, color);
     draw_pixel(x+23, y+12, color);
-    draw_line(x+22,y+7,x+22, y+9);
-    draw_line(x+22, y+10, x+22, y+16);
-    draw_pixel(x+21, y+2, color);
-    draw_line()
+    draw_line(x+22,y+7,x+22, y+16,color);
     draw_pixel(x+21, y+6, color);
     draw_pixel(x+21, y+7, color);
     draw_pixel(x+21, y+8, color);
