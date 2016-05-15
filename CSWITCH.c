@@ -10,6 +10,7 @@
 
 #include "drawlib.h"
 #include "stdlib.h"
+#include "keybios.h"
 
 
 //****************************************************************************
@@ -55,7 +56,7 @@ typedef struct Particle{
 } Particle;
 
 int BALL_DIAMETER = 4;
-unsigned int key, key1, key2, unused = 0;
+unsigned int key, key1, key2, prev_key, prev_key2, unused = 0;
 int ball_x = SCREEN_WIDTH/2, ball_y = SCREEN_HEIGHT/2;
 int ball_speed = 5;
 Star stars[10];
@@ -67,6 +68,7 @@ int angle = 0;
 int score = 0, highscore = 0;
 int ball_dead = FALSE;
 int explosion_counter = 0;
+int key_repeat = FALSE;
 
 void fill_screen(int color);
 void fill_old_squares();
@@ -89,24 +91,34 @@ int random_number(int min, int max){
 }
 
 int handle_keys(){
-    if(key1 == 3 && key2 == 2){ //EXE key
-        switch(gamestate){
-            case MENU:
-                fill_screen(BLACK);
-                gamestate = GAMEPLAY;
-            case GAMEPLAY:
-                ball_jump();
-                break;
-            case GAMEOVER:
-                fill_screen(BLACK);
-                gamestate = GAMEPLAY;
-                break;
-        }
-    }else if(key1 == 4 && key2 == 8){ //EXIT key
-        return FALSE;
-    }else if(key1 == 4 && key2 == 9){ //MENU key
-        return FALSE;
+    Bkey_GetKeyWait(&key1, &key2, KEYWAIT_HALTOFF_TIMEROFF, 0, 1, &unused);
+    if(prev_key == key1 && prev_key2 == key2){
+        key_repeat = TRUE;
+    }else{
+        key_repeat = FALSE;
     }
+    if(!key_repeat){
+        if(key1 == 3 && key2 == 2){ //EXE key
+            switch(gamestate){
+                case MENU:
+                    fill_screen(BLACK);
+                    gamestate = GAMEPLAY;
+                case GAMEPLAY:
+                    ball_jump();
+                    break;
+                case GAMEOVER:
+                    fill_screen(BLACK);
+                    gamestate = GAMEPLAY;
+                    break;
+            }
+        }else if(key1 == 4 && key2 == 8){ //EXIT key
+            return FALSE;
+        }else if(key1 == 4 && key2 == 9){ //MENU key
+            return FALSE;
+        }
+    }
+    prev_key = key1;
+    prev_key2 = key2;
     key1 = key2 = 0;
     return TRUE;
 }
@@ -135,6 +147,7 @@ void gen_obstacles(){
     int i;
     for(i = 0; i <= 9; i++){
         int rand = random_number(0,1);
+        //int rand = 1;
         Star star;
         Obstacle obstacle;
         //obstacle = new_obstacle(star.x, star.y, WHITE);
@@ -145,12 +158,12 @@ void gen_obstacles(){
         obstacle.y = star.y;
         obstacle.color = WHITE;
         if(rand == 0){
-            obstacle.rad = 25;
-            obstacle.thickness = 5;
+            obstacle.rad = 26;
+            obstacle.thickness = 6;
             obstacle.shape = CIRCLE;
         }else if(rand == 1){
-            obstacle.rad = 15;
-            obstacle.thickness = 3;
+            obstacle.rad = 22;
+            obstacle.thickness = 4;
             obstacle.shape = DOUBLE_CIRCLE;
         }
         stars[i] = star;
@@ -183,7 +196,7 @@ void fill_old_squares(){
                     if(obstacle.shape == CIRCLE){
                         draw_filled_circle(obstacle.x-cam.x, obstacle.y, 29, !obstacle.color);
                     }else if(obstacle.shape == DOUBLE_CIRCLE){
-                        draw_filled_circle(obstacle.x-cam.x, obstacle.y, 30, !obstacle.color);
+                        draw_filled_circle(obstacle.x-cam.x, obstacle.y, 38, !obstacle.color);
                     }
                 }
             }
@@ -199,7 +212,7 @@ int AddIn_main(int isAppli, unsigned short OptionNum){
     cam.x = 0; cam.y = 0;
     Sleep(50);
     while(handle_keys()){
-        Bkey_GetKeyWait(&key1, &key2, KEYWAIT_HALTOFF_TIMEROFF, 0, 1, &unused);
+        //Bkey_GetKeyWait(&key1, &key2, KEYWAIT_HALTOFF_TIMEROFF, 0, 1, &unused);
         
         fill_old_squares();
 
@@ -511,7 +524,7 @@ void draw_stars(){
 }
 
 void ball_jump(){
-    ball_speed = 4;
+    ball_speed = 5;
 }
 
 void ball_update(){
