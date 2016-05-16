@@ -10,7 +10,7 @@
 
 #include "drawlib.h"
 #include "stdlib.h"
-#include "keybios.h"
+#include "stdio.h"
 
 
 //****************************************************************************
@@ -34,7 +34,7 @@
 #define FALSE           0
 #define PARTICLE_COUNT  20
 
-typedef enum {CIRCLE, DOUBLE_CIRCLE, LINE} Shape;
+typedef enum {CIRCLE, DOUBLE_CIRCLE, DOUBLE_CIRCLE_2, LINE} Shape;
 typedef enum {MENU, GAMEPLAY, PAUSED, GAMEOVER} State;
 
 typedef struct Star{
@@ -86,6 +86,39 @@ void draw_gameover_screen();
 void respawn();
 Obstacle new_obstacle(int x, int y, int COLOR);
 
+char * itoa(int number){
+    char buffer[4];
+    //sprintf(buffer, "%d", number);
+    switch(number){
+        case 0:
+            return "0";
+        case 1:
+            return "1";
+        case 2:
+            return "2";
+        case 3:
+            return "3";
+        case 4:
+            return "4";
+        case 5:
+            return "5";
+        case 6:
+            return "6";
+        case 7:
+            return "7";
+        case 8:
+            return "8";
+        case 9:
+            return "9";
+        case 10:
+            return "10";
+        case 11:
+            return "11";
+    }
+    return buffer;
+}
+
+
 int random_number(int min, int max){
     int range = max-min+1;
     return (int)(rand()%range+min);
@@ -109,7 +142,7 @@ int handle_keys(){
                     break;
                 case GAMEOVER:
                     fill_screen(BLACK);
-                    gamestate = GAMEPLAY;
+                    respawn();
                     break;
             }
         }else if(key1 == 4 && key2 == 8){ //EXIT key
@@ -141,14 +174,24 @@ void draw_obstacle(Obstacle obstacle){
         draw_circle(obstacle.x-cam.x, obstacle.y-obstacle.rad, obstacle.rad, obstacle.color);
         draw_circle(obstacle.x-cam.x, obstacle.y+obstacle.rad, obstacle.rad-obstacle.thickness, obstacle.color);
         draw_circle(obstacle.x-cam.x, obstacle.y+obstacle.rad, obstacle.rad, obstacle.color);
+    }else if(obstacle.shape == DOUBLE_CIRCLE_2){
+        for(i = obstacle.rad-obstacle.thickness; i <= obstacle.rad; i+=2){
+            draw_arc(obstacle.x-cam.x, obstacle.y, i, angle, angle+90, obstacle.color);
+            draw_arc(obstacle.x-cam.x, obstacle.y, i+8, 270-angle, 270-angle+90, obstacle.color);
+        }
+        draw_circle(obstacle.x-cam.x, obstacle.y, obstacle.rad-obstacle.thickness, obstacle.color);
+        draw_circle(obstacle.x-cam.x, obstacle.y, obstacle.rad, obstacle.color);
+        draw_circle(obstacle.x-cam.x, obstacle.y, obstacle.rad-obstacle.thickness+8, obstacle.color);
+        draw_circle(obstacle.x-cam.x, obstacle.y, obstacle.rad+8, obstacle.color);
+
     }
 }
 
 void gen_obstacles(){
     int i;
     for(i = 0; i <= 9; i++){
-        int rand = random_number(0,1);
-        //int rand = 1;
+        // int rand = random_number(0,2);
+        int rand = 2;
         Star star;
         Obstacle obstacle;
         //obstacle = new_obstacle(star.x, star.y, WHITE);
@@ -166,6 +209,10 @@ void gen_obstacles(){
             obstacle.rad = 22;
             obstacle.thickness = 4;
             obstacle.shape = DOUBLE_CIRCLE;
+        }else if(rand == 2){
+            obstacle.rad = 24;
+            obstacle.thickness = 5;
+            obstacle.shape = DOUBLE_CIRCLE_2;
         }
         stars[i] = star;
         obstacles[i] = obstacle;
@@ -198,6 +245,8 @@ void fill_old_squares(){
                         draw_filled_circle(obstacle.x-cam.x, obstacle.y, 29, !obstacle.color);
                     }else if(obstacle.shape == DOUBLE_CIRCLE){
                         draw_filled_circle(obstacle.x-cam.x, obstacle.y, 38, !obstacle.color);
+                    }else if(obstacle.shape == DOUBLE_CIRCLE_2){
+                        draw_filled_circle(obstacle.x-cam.x, obstacle.y, 32, !obstacle.color);
                     }
                 }
             }
@@ -211,7 +260,7 @@ int AddIn_main(int isAppli, unsigned short OptionNum){
     
     gen_obstacles();
     cam.x = 0; cam.y = 0;
-    Sleep(50);
+    Sleep(40);
     while(handle_keys()){
         //Bkey_GetKeyWait(&key1, &key2, KEYWAIT_HALTOFF_TIMEROFF, 0, 1, &unused);
         
@@ -253,6 +302,18 @@ int AddIn_main(int isAppli, unsigned short OptionNum){
     return 1;
 }
 
+void respawn(){
+    gamestate = GAMEPLAY;
+    ball_x = SCREEN_WIDTH/2;
+    ball_y = SCREEN_HEIGHT/2;
+    ball_dead = FALSE;
+    gen_obstacles();
+    cam.x = 0;
+    cam.y = 0;
+    score = 0;
+    ball_speed = 0;
+}
+
 void draw_replay_button(int x, int y, int color){
     x-=12;
     y-=12;
@@ -290,10 +351,10 @@ void draw_replay_button(int x, int y, int color){
 
 void draw_gameover_screen(){
     draw_vertical_text("SCORE", 100, 10, WHITE);
-    draw_vertical_text("0", 88, 30, WHITE);
+    draw_vertical_text(itoa(score), 88, 30, WHITE);
     draw_filled_rectangle(60,0,10, SCREEN_HEIGHT, WHITE);
     draw_vertical_text("BEST", 60, 18, BLACK);
-    draw_vertical_text("0", 48, 30, WHITE);
+    draw_vertical_text(itoa(highscore), 48, 30, WHITE);
     draw_filled_circle(25,29, 14, WHITE);
     draw_circle(25,29, 16, WHITE);
     draw_replay_button(25,30, BLACK);
@@ -367,11 +428,11 @@ void ball_jump(){
 void ball_update(){
     int i;
     if(!ball_dead){
+        collision_detection();
         ball_x+=ball_speed;
         if(cam.x <= ball_x-SCREEN_WIDTH*0.4)
             cam.x = ball_x-SCREEN_WIDTH*0.4;
         ball_speed-=1;
-        collision_detection();
     }else{
         for(i = 0; i <= PARTICLE_COUNT-1; i++){
             particles[i].x+=particles[i].vel_x;
@@ -379,16 +440,12 @@ void ball_update(){
            particles[i].vel_x--;
         }
         explosion_counter++;
-        if(explosion_counter >= 20){
+        if(explosion_counter >= 18){
             gamestate = GAMEOVER;
             explosion_counter = 0;
             fill_screen(BLACK);
         }
     }
-}
-
-void respawn(){
-    
 }
 
 void ball_draw(int color){
@@ -417,8 +474,9 @@ void fill_screen(int color){
 void draw_score(int color){
     int ones, tens, hundreds;
     if(score < 10){
-        draw_filled_rectangle(122,1,5,4,!color);
-        draw_number(score, 126, 1, color);
+        draw_filled_rectangle(118,1,9,9,!color);
+        //draw_number(score, 126, 1, color);
+        draw_vertical_text(itoa(score), 118, 1, color);
     }else if(score < 100){
         tens = (int)score/10;
         ones = score-(tens*10);
@@ -438,6 +496,9 @@ void draw_score(int color){
 
 void ball_explode(){
     int i;
+    if(score > highscore){
+        highscore = score;
+    }
     ball_dead = TRUE;
     for(i = 0; i <= PARTICLE_COUNT-1; i++){
         Particle particle;
@@ -482,15 +543,25 @@ void collision_detection(){
     }
     for(i = 0; i <= 9; i++){
         obstacle = obstacles[i];
-        if(obstacle.x -cam.x > 0 && obstacle.x-cam.x < SCREEN_WIDTH){
+        if(obstacle.x -cam.x+8 > 0 && obstacle.x-cam.x < SCREEN_WIDTH){
             if(obstacle.shape == CIRCLE){
-                if((ball_x+BALL_DIAMETER/2 >= obstacle.x+obstacles[i].rad-obstacles[i].thickness && ball_x-BALL_DIAMETER/2 <= obstacles[i].x+obstacles[i].rad) && !(angle >= 90 && angle <= 180)){
+                if((ball_x+BALL_DIAMETER/2 >= obstacle.x+obstacle.rad-obstacle.thickness && ball_x-BALL_DIAMETER/2 <= obstacle.x+obstacle.rad) && !(angle >= 90 && angle <= 180)){
                     ball_explode();
-                }else if((ball_x+BALL_DIAMETER/2 >= obstacle.x-obstacle.rad && ball_x-BALL_DIAMETER/2 <= obstacle.x-obstacle.rad+obstacles[i].thickness) && !(angle >= 270 && angle <= 360)){
+                }else if((ball_x+BALL_DIAMETER/2 >= obstacle.x-obstacle.rad && ball_x-BALL_DIAMETER/2 <= obstacle.x-obstacle.rad+obstacle.thickness) && !(angle >= 270 && angle <= 360)){
                     ball_explode();
                 }
             }else if(obstacle.shape == DOUBLE_CIRCLE){
-                if(ball_x+BALL_DIAMETER/2 >= obstacle.x-7 && ball_x-BALL_DIAMETER/2 <= obstacle.x-7 && !(angle >= 180 && angle <= 270)){
+                if(ball_x+BALL_DIAMETER/2 >= obstacle.x-11 && ball_x-BALL_DIAMETER/2 <= obstacle.x+11 && !(angle >= 180 && angle <= 270)){
+                    ball_explode();
+                }
+            }else if(obstacle.shape == DOUBLE_CIRCLE_2){
+                if(ball_x+BALL_DIAMETER/2 >= obstacle.x+obstacle.rad-obstacle.thickness && ball_x - BALL_DIAMETER/2 <= obstacle.x+obstacle.rad && !(angle >= 90 && angle <= 180)){
+                    ball_explode();
+                }else if((ball_x+BALL_DIAMETER/2 >= obstacle.x-obstacle.rad && ball_x-BALL_DIAMETER/2 <= obstacle.x-obstacle.rad+obstacle.thickness) && !(angle >= 270 && angle <= 360)){
+                    ball_explode();
+                }else if(ball_x+BALL_DIAMETER/2 >= obstacle.x+obstacle.rad+8-obstacle.thickness && ball_x - BALL_DIAMETER/2 <= obstacle.x+obstacle.rad+8 && !(angle >= 90 && angle <= 180)){
+                    ball_explode();
+                }else if((ball_x+BALL_DIAMETER/2 >= obstacle.x-obstacle.rad-8 && ball_x-BALL_DIAMETER/2 <= obstacle.x-obstacle.rad-8+obstacle.thickness) && !(angle >= 270 && angle <= 360)){
                     ball_explode();
                 }
             }
