@@ -190,8 +190,8 @@ void draw_obstacle(Obstacle obstacle){
 void gen_obstacles(){
     int i;
     for(i = 0; i <= 9; i++){
-        // int rand = random_number(0,2);
-        int rand = 2;
+        int rand = random_number(0,2);
+        // int rand = 2;
         Star star;
         Obstacle obstacle;
         //obstacle = new_obstacle(star.x, star.y, WHITE);
