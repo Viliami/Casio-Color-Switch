@@ -5,4 +5,4 @@ Color Switch Game for the Casio fx-9860GII
 ![Screenshot](screenshot.bmp)
 
 ###DEMO
-![Demo](demo.gif)
+![Demo](d1.gif)
