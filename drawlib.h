@@ -2,7 +2,7 @@
 #include "mathlib.h"
 
 void draw_pixel(int x, int y, int color){
-    if(x >= 0 && x <= 127)
+    if(x >= 0 && x <= 127 && y >= 0 && y <= 63)
         Bdisp_SetPoint_VRAM(x,y,color);
 }
 
