@@ -6,38 +6,95 @@ void draw_pixel(int x, int y, int color){
         Bdisp_SetPoint_VRAM(x,y,color);
 }
 
-void draw_line(int x0, int y0, int x1, int y1, int color){
-    int dX = x1-x0, dY = y1-y0, dErr = 0, x = 0, y = 0, error = 0;
-    
-    if(dX == 0){
-        for(y = y0; y <= y1; y++){
-            draw_pixel(x0,y, color);
+void draw_line(int x1,int y1,int x2,int y2,int color){
+    int x, y, dx, dy, dx1, dy1, px, py, xe, ye, i;
+    dx = x2-x1;
+    dy = y2-y1;
+    dx1 = fabs(dx);
+    dy1 = fabs(dy);
+    px = 2*dy1-dx1;
+    py = 2*dx1-dy1;
+    if(dy1<=dx1){
+        if(dx>=0){
+           x=x1;
+           y=y1;
+           xe=x2;
+        }else{
+           x=x2;
+           y=y2;
+           xe=x1;
         }
-        return;
-    }else if(dY == 0){
-        for(x = x0; x <= x1; x++){
-            draw_pixel(x,y0, color);
+        draw_pixel(x,y,color);
+        for(i=0;x<xe;i++){
+            x=x+1;
+            if(px<0){
+                px=px+2*dy1;
+            }else{
+                if((dx<0 && dy<0) || (dx>0 && dy>0)){
+                    y=y+1;
+                }else{
+                    y=y-1;
+                }
+                px=px+2*(dy1-dx1);
+            }
+            draw_pixel(x,y,color);
         }
-        return;
     }else{
-        dErr = dY/dX;
-        if(dErr < 0)
-            dErr = dErr*-1;
-    }
-    //for x in range(x0), x1)){
-    for(x = x0; x <= x1; x++){
-        draw_pixel(x,y, color);
-        error+=dErr;
-        while(error >= 0.5){
-            draw_pixel(x,y, color);
-            y += sgn(dY);
-            error -= 1;
+        if(dy>=0){
+           x=x1;
+           y=y1;
+           ye=y2;
+        }else{
+           x=x2;
+           y=y2;
+           ye=y1;
+        }
+        draw_pixel(x,y,color);
+        for(i=0;y<ye;i++){
+            y=y+1;
+            if(py<=0){
+                py=py+2*dx1;
+            }else{
+                if((dx<0 && dy<0) || (dx>0 && dy>0)){
+                    x=x+1;
+                }else{
+                    x=x-1;
+                }
+                py=py+2*(dx1-dy1);
+            }
+            draw_pixel(x,y,color);
         }
     }
 }
 
-void draw_rectangle(int x, int y, int w, int h, int color){
+
+void draw_triangle(int x0, int y0, int x1, int y1, int x2, int y2, int color){
+    draw_line(x0, y0, x1, y1, color);
+    draw_line(x1, y1, x2, y2, color);
+    draw_line(x2, y2, x0, y0, color);
+}
+
+void draw_rotated_triangle(int x0, int y0, int x1, int y1, int x2, int y2, int angle, int color){
+    //find centroid
+    int cX = (int)((x0+x1+x2)/3);
+    int cY = (int)((y0+y1+y2)/3);
+    int n_x0, n_y0, n_x1, n_y1, n_x2, n_y2;
+    float ang;
+    x0-=cX;
+    x1-=cX;
+    x2-=cX;
+    y0-=cY;
+    y1-=cY;
+    y2-=cY;
     
+    ang = radians(angle);
+    n_x0 = x0*cos(ang) - y0*sin(ang);
+    n_y0 = x0*sin(ang) + y0*cos(ang);
+    n_x1 = x1*cos(ang) - y1*sin(ang);
+    n_y1 = x1*sin(ang) + y1*cos(ang);
+    n_x2 = x2*cos(ang) - y2*sin(ang);
+    n_y2 = x2*sin(ang) + y2*cos(ang);
+    draw_triangle(n_x0+cX, n_y0+cY, n_x1+cX, n_y1+cY, n_x2+cX, n_y2+cY, color);
 }
 
 void draw_filled_rectangle(int x, int y, int w, int h, int color){
